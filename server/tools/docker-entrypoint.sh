@@ -77,13 +77,10 @@ fi
 ########################
 
 if [[ -z ${BIND:-} ]]; then
-    BIND=$(hostname --all-ip-addresses)
+    BIND=$(curl -s http://169.254.170.2/v2/metadata | jq -r .Containers[0].Networks[0].IPv4Addresses[0])
 fi
 if [[ -z ${BIND_OPTS:-} ]]; then
-    for BIND_IP in $BIND
-    do
-        BIND_OPTS+=" -Djboss.bind.address=$BIND_IP -Djboss.bind.address.private=$BIND_IP "
-    done
+    BIND_OPTS+=" -Djboss.bind.address=$BIND_IP -Djboss.bind.address.private=$BIND_IP "
 fi
 SYS_PROPS+=" $BIND_OPTS"
 
